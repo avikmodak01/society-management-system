@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin PIN Management - Society System</title>
+    
+    <!-- External JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+    
+    <style>
+                /* Admin Logout Button - Add to existing styles */
+.admin-logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 9998;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    transition: all 0.3s ease;
+}
+
+.admin-logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.admin-logout-btn:active {
+    transform: translateY(0);
+}
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #7f8c8d;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Search Container */
+        .search-container {
+            position: relative;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f1f1;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item.selected {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .search-no-results {
+            padding: 12px 15px;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .member-id {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-default {
+            background: #e8f4fd;
+            color: #0c5460;
+        }
+
+        .status-custom {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Statistics Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .stats-card h4 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stats-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* PIN Display */
+        .pin-display {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e1e8ed;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        /* Action Buttons in Table */
+        .btn-small {
+            padding: 5px 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <button id="adminLogoutBtn" class="admin-logout-btn" onclick="adminLogout()" title="Logout from admin panel">
+    🚪 Logout
+</button>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔐 PIN Management System</h1>
+            <p>Manage member login PINs for the Society Portal</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('set-pin')">
+                🔑 Set/Update PIN
+            </button>
+            <button class="nav-tab" onclick="showTab('view-pins')">
+                👥 View All PINs
+            </button>
+            <button class="nav-tab" onclick="showTab('bulk-reset')">
+                🔄 Bulk Operations
+            </button>
+            <button class="nav-tab" onclick="showTab('statistics')">
+                📊 Statistics
+            </button>
+        </div>
+
+        <!-- Set/Update PIN Section -->
+        <div id="set-pin" class="content-section active">
+            <h2 class="section-title">Set or Update Member PIN</h2>
+            
+            <div class="alert alert-info">
+                <strong>📋 PIN Information:</strong><br>
+                • Default PIN for new members: Last 4 digits of mobile number<br>
+                • Custom PINs must be exactly 4 digits<br>
+                • Members can use their PIN to login to the member portal<br>
+                • PINs are stored securely and can be reset by admin
+            </div>
+
+            <form id="setPinForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="memberSearch">Search Member *</label>
+                        <div class="search-container">
+                            <input type="text" id="memberSearch" placeholder="Type member name or ID to search..." autocomplete="off" required>
+                            <input type="hidden" id="selectedMemberId" required>
+                            <div id="memberSearchResults" class="search-results"></div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <label for="newPin">New 4-Digit PIN *</label>
+                        <input type="password" id="newPin" placeholder="Enter 4-digit PIN" required maxlength="4">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="confirmPin">Confirm PIN *</label>
+                        <input type="password" id="confirmPin" placeholder="Confirm 4-digit PIN" required maxlength="4">
+                    </div>
+                    <div class="form-col" style="display: flex; align-items: flex-end; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">🔑 Set PIN</button>
+                        <button type="button" class="btn btn-warning" onclick="generateRandomPin()">🎲 Generate Random</button>
+                        <button type="button" class="btn btn-success" onclick="useDefaultPin()">📱 Use Default PIN</button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="pinSetResult"></div>
+        </div>
+
+        <!-- View All PINs Section -->
+        <div id="view-pins" class="content-section">
+            <h2 class="section-title">All Member PINs</h2>
+            
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-col">
+                    <label for="statusFilter">Filter by Status</label>
+                    <select id="statusFilter" onchange="filterPins()">
+                        <option value="">All Members</option>
+                        <option value="default">Default PIN (Last 4 digits)</option>
+                        <option value="custom">Custom PIN Set</option>
+                    </select>
+                </div>
+                <div class="form-col" style="display: flex; align-items: flex-end;">
+                    <button class="btn btn-primary" onclick="loadAllPins()">🔄 Refresh List</button>
+                </div>
+            </div>
+
+            <div id="pinsTable">
+                <!-- PINs table will be populated here -->
+            </div>
+        </div>
+
+        <!-- Bulk Operations Section -->
+        <div id="bulk-reset" class="content-section">
+            <h2 class="section-title">Bulk PIN Operations</h2>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ Warning:</strong> Bulk operations will affect multiple members at once. Use with caution!
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <h3>Reset All PINs to Default</h3>
+                    <p>This will reset all member PINs to their default values (last 4 digits of mobile number)</p>
+                    <button class="btn btn-danger" onclick="bulkResetToDefault()">
+                        🔄 Reset All to Default
+                    </button>
+                </div>
+                <div class="form-col">
+                    <h3>Remove All Custom PINs</h3>
+                    <p>This will remove all custom PINs, making members use default PINs</p>
+                    <button class="btn btn-warning" onclick="bulkRemoveCustomPins()">
+                        🗑️ Remove Custom PINs
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 30px;">
+                <div class="form-col">
+                    <h3>Initialize Member Portal Access</h3>
+                    <p>This will ensure all active members can access the member portal with default PINs</p>
+                    <button class="btn btn-success" onclick="initializeMemberPortal()">
+                        🚀 Initialize Portal Access
+                    </button>
+                </div>
+                <div class="form-col">
+                    <!-- Empty for layout balance -->
+                </div>
+            </div>
+
+            <div id="bulkOperationResult"></div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div id="statistics" class="content-section">
+            <h2 class="section-title">PIN Management Statistics</h2>
+            
+            <div class="stats-cards" id="statisticsCards">
+                <!-- Statistics cards will be populated here -->
+            </div>
+
+            <div class="alert alert-info">
+                <strong>📊 Statistics Information:</strong><br>
+                • <strong>Total Members:</strong> All active members in the system<br>
+                • <strong>Default PINs:</strong> Members using last 4 digits of mobile as PIN<br>
+                • <strong>Custom PINs:</strong> Members with admin-set custom PINs<br>
+                • <strong>Portal Ready:</strong> Members who can access the member portal<br>
+                • Regular monitoring helps ensure secure access management
+            </div>
+
+            <button class="btn btn-primary" onclick="loadStatistics()">🔄 Refresh Statistics</button>
+        </div>
+    </div>
+
+    <!-- Secure Configuration -->
+    <script src="config.js"></script>
+    <script src="security-utils.js"></script>
+    
+    <script>
+        // Secure Supabase Configuration
+        let supabase;
+        let appConfig;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Load secure configuration
+                appConfig = await window.SecureConfig.loadConfig();
+                
+                if (!window.SecureConfig.validateConfig()) {
+                    throw new Error('Invalid configuration loaded');
+                }
+                
+                // Initialize Supabase with secure config
+                const supabaseConfig = window.SecureConfig.getSupabaseConfig();
+                supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                
+                console.log('✅ Admin Panel initialized securely');
+                
+                // Initialize application
+                setupEventListeners();
+                initializePinTable();
+                loadAllPins();
+                loadStatistics();
+                
+            } catch (error) {
+                console.error('❌ Admin Panel initialization failed:', error);
+                showAlert('System initialization failed. Please refresh the page.', 'error');
+            }
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Set PIN form submission
+            const setPinForm = document.getElementById('setPinForm');
+            if (setPinForm) {
+                setPinForm.addEventListener('submit', handleSetPin);
+            }
+
+            // Member search functionality
+            setupMemberSearch();
+
+            // Allow only numbers in PIN inputs
+            ['newPin', 'confirmPin'].forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+                }
+            });
+        }
+
+        // Setup member search functionality
+        function setupMemberSearch() {
+            const searchInput = document.getElementById('memberSearch');
+            const hiddenInput = document.getElementById('selectedMemberId');
+            const resultsDiv = document.getElementById('memberSearchResults');
+
+            if (!searchInput || !hiddenInput || !resultsDiv) return;
+
+            let selectedIndex = -1;
+            let searchResults = [];
+
+            // Search input event
+            searchInput.addEventListener('input', async function() {
+                const searchTerm = this.value.trim().toLowerCase();
+                
+                if (searchTerm.length === 0) {
+                    resultsDiv.style.display = 'none';
+                    hiddenInput.value = '';
+                    selectedIndex = -1;
+                    return;
+                }
+
+                if (searchTerm.length < 2) {
+                    return; // Wait for at least 2 characters
+                }
+
+                try {
+                    // Search for members
+                    const { data: members, error } = await supabase
+                        .from('members')
+                        .select('id, name, contact')
+                        .eq('status', 'active')
+                        .or(`name.ilike.%${searchTerm}%,contact.ilike.%${searchTerm}%`)
+                        .order('name')
+                        .limit(10);
+                    
+                    if (error) throw error;
+
+                    searchResults = members || [];
+                    await displaySearchResults(searchResults);
+                    selectedIndex = -1;
+                    
+                } catch (error) {
+                    console.error('Error searching members:', error);
+                }
+            });
+
+            // Handle keyboard navigation
+            searchInput.addEventListener('keydown', function(e) {
+                const items = resultsDiv.querySelectorAll('.search-result-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (selectedIndex < items.length - 1) {
+                        selectedIndex++;
+                        updateSelection(items, selectedIndex);
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (selectedIndex > 0) {
+                        selectedIndex--;
+                        updateSelection(items, selectedIndex);
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && selectedIndex < items.length) {
+                        selectMember(searchResults[selectedIndex]);
+                    }
+                } else if (e.key === 'Escape') {
+                    resultsDiv.style.display = 'none';
+                    selectedIndex = -1;
+                }
+            });
+
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+                    resultsDiv.style.display = 'none';
+                    selectedIndex = -1;
+                }
+            });
+
+            // Display search results
+            async function displaySearchResults(results) {
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="search-no-results">No members found</div>';
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+
+                let html = '';
+                for (const member of results) {
+                    // Get current PIN status
+                    const { data: pinData } = await supabase
+                        .from('member_pins')
+                        .select('pin')
+                        .eq('member_id', member.id)
+                        .single();
+
+                    const pinStatus = pinData ? 'Custom PIN' : 'Default PIN';
+                    const defaultPin = member.contact.slice(-4);
+
+                    html += `
+                        <div class="search-result-item" data-index="${results.indexOf(member)}" onclick="selectMemberFromClick(${member.id}, '${member.name.replace(/'/g, "\\'")}', '${member.contact}')">
+                            <div class="member-id">MS${String(member.id).padStart(4, '0')}</div>
+                            <div><strong>${member.name}</strong></div>
+                            <div style="font-size: 12px; color: #666;">📱 ${member.contact}</div>
+                            <div style="font-size: 11px; color: ${pinData ? '#27ae60' : '#3498db'};">
+                                ${pinStatus} ${!pinData ? `(${defaultPin})` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                resultsDiv.innerHTML = html;
+                resultsDiv.style.display = 'block';
+            }
+
+            // Update selection highlight
+            function updateSelection(items, selectedIndex) {
+                items.forEach((item, index) => {
+                    if (index === selectedIndex) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Select member
+            function selectMember(member) {
+                hiddenInput.value = member.id;
+                searchInput.value = `MS${String(member.id).padStart(4, '0')} - ${member.name}`;
+                resultsDiv.style.display = 'none';
+
+                // Auto-fill default PIN
+                const defaultPin = member.contact.slice(-4);
+                document.getElementById('newPin').placeholder = `Default: ${defaultPin}`;
+                document.getElementById('confirmPin').placeholder = `Default: ${defaultPin}`;
+            }
+
+            // Global function for onclick
+            window.selectMemberFromClick = function(memberId, memberName, contact) {
+                const member = { id: memberId, name: memberName, contact: contact };
+                selectMember(member);
+            };
+        }
+
+        // Handle set PIN form submission
+        async function handleSetPin(event) {
+            event.preventDefault();
+            
+            const memberId = document.getElementById('selectedMemberId').value;
+            const newPin = document.getElementById('newPin').value.trim();
+            const confirmPin = document.getElementById('confirmPin').value.trim();
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            
+            // Validate inputs
+            if (!memberId) {
+                showAlert('Please select a member', 'error');
+                return;
+            }
+            
+            if (newPin.length !== 4 || confirmPin.length !== 4) {
+                showAlert('PIN must be exactly 4 digits', 'error');
+                return;
+            }
+            
+            if (newPin !== confirmPin) {
+                showAlert('PIN and confirmation do not match', 'error');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>Setting PIN...';
+
+            try {
+                // Get member details
+                const { data: member, error: memberError } = await supabase
+                    .from('members')
+                    .select('name, contact')
+                    .eq('id', memberId)
+                    .single();
+
+                if (memberError) throw memberError;
+
+                const defaultPin = member.contact.slice(-4);
+                
+                // Check if this is setting to default PIN
+                if (newPin === defaultPin) {
+                    // Remove custom PIN entry (use default)
+                    const { error: deleteError } = await supabase
+                        .from('member_pins')
+                        .delete()
+                        .eq('member_id', memberId);
+
+                    if (deleteError && deleteError.code !== 'PGRST116') {
+                        throw deleteError;
+                    }
+
+                    showAlert(`Default PIN set for ${member.name}. They can now login with ${defaultPin}`, 'success');
+                } else {
+                    // Use UPSERT to handle both INSERT and UPDATE
+                    const { error: upsertError } = await supabase
+                        .from('member_pins')
+                        .upsert(
+                            {
+                                member_id: parseInt(memberId),
+                                pin: newPin,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            },
+                            { 
+                                onConflict: 'member_id',
+                                ignoreDuplicates: false 
+                            }
+                        );
+
+                    if (upsertError) throw upsertError;
+
+                    showAlert(`Custom PIN set for ${member.name}. They can now login with their new PIN`, 'success');
+                }
+
+                // Reset form
+                document.getElementById('setPinForm').reset();
+                document.getElementById('memberSearch').value = '';
+                document.getElementById('selectedMemberId').value = '';
+                document.getElementById('pinSetResult').innerHTML = '';
+
+                // Refresh pins table and statistics
+                await Promise.all([
+                    loadAllPins(),
+                    loadStatistics()
+                ]);
+
+            } catch (error) {
+                console.error('Error setting PIN:', error);
+                showAlert('Error setting PIN: ' + error.message, 'error');
+            } finally {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🔑 Set PIN';
+            }
+        }
+
+        // Generate random 4-digit PIN
+        function generateRandomPin() {
+            const randomPin = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('newPin').value = randomPin;
+            document.getElementById('confirmPin').value = randomPin;
+            showAlert('Random PIN generated: ' + randomPin, 'info');
+        }
+
+        // Use default PIN (last 4 digits of mobile)
+        async function useDefaultPin() {
+            const memberId = document.getElementById('selectedMemberId').value;
+            
+            if (!memberId) {
+                showAlert('Please select a member first', 'error');
+                return;
+            }
+
+            try {
+                const { data: member, error } = await supabase
+                    .from('members')
+                    .select('contact')
+                    .eq('id', memberId)
+                    .single();
+
+                if (error) throw error;
+
+                const defaultPin = member.contact.slice(-4);
+                document.getElementById('newPin').value = defaultPin;
+                document.getElementById('confirmPin').value = defaultPin;
+                showAlert('Default PIN filled: ' + defaultPin, 'info');
+
+            } catch (error) {
+                console.error('Error getting default PIN:', error);
+                showAlert('Error getting default PIN', 'error');
+            }
+        }
+
+        // Initialize PIN table structure
+        function initializePinTable() {
+            // Create member_pins table if it doesn't exist (handled by database migration)
+            console.log('PIN table structure should be created in database');
+        }
+
+        // Load all PINs
+        async function loadAllPins() {
+            try {
+                // Get all active members with their PIN status
+                const { data: members, error: membersError } = await supabase
+                    .from('members')
+                    .select('id, name, contact')
+                    .eq('status', 'active')
+                    .order('name');
+
+                if (membersError) throw membersError;
+
+                // Get custom PINs
+                const { data: customPins, error: pinsError } = await supabase
+                    .from('member_pins')
+                    .select('member_id, pin, updated_at');
+
+                if (pinsError && pinsError.code !== 'PGRST116') {
+                    throw pinsError;
+                }
+
+                displayPinsTable(members || [], customPins || []);
+
+            } catch (error) {
+                console.error('Error loading PINs:', error);
+                showAlert('Error loading PIN data: ' + error.message, 'error');
+            }
+        }
+
+        // Display PINs table
+        function displayPinsTable(members, customPins) {
+            if (members.length === 0) {
+                document.getElementById('pinsTable').innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Active Members</h3>
+                        <p>No active members found in the system.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create a map of custom PINs
+            const pinMap = {};
+            customPins.forEach(pin => {
+                pinMap[pin.member_id] = pin;
+            });
+
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Current PIN</th>
+                            <th>PIN Type</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            members.forEach(member => {
+                const customPin = pinMap[member.id];
+                const defaultPin = member.contact.slice(-4);
+                const currentPin = customPin ? customPin.pin : defaultPin;
+                const pinType = customPin ? 'Custom' : 'Default';
+                const lastUpdated = customPin ? 
+                    new Date(customPin.updated_at).toLocaleDateString() : 
+                    'Default';
+
+                tableHTML += `
+                    <tr>
+                        <td>MS${String(member.id).padStart(4, '0')}</td>
+                        <td><strong>${member.name}</strong></td>
+                        <td>${member.contact}</td>
+                        <td><span class="pin-display">${currentPin}</span></td>
+                        <td><span class="status-badge status-${customPin ? 'custom' : 'default'}">${pinType}</span></td>
+                        <td>${lastUpdated}</td>
+                        <td>
+                            <button class="btn btn-warning btn-small" onclick="resetPinToDefault(${member.id}, '${member.name.replace(/'/g, "\\'")}')">
+                                🔄 Reset
+                            </button>
+                            <button class="btn btn-primary btn-small" onclick="editPin(${member.id}, '${member.name.replace(/'/g, "\\'")}', '${member.contact}')">
+                                ✏️ Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            document.getElementById('pinsTable').innerHTML = tableHTML;
+        }
+
+        // Filter PINs by type
+        function filterPins() {
+            const filterValue = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#pinsTable tbody tr');
+            
+            rows.forEach(row => {
+                const pinType = row.querySelector('.status-badge').textContent.toLowerCase();
+                
+                if (!filterValue || 
+                    (filterValue === 'default' && pinType === 'default') ||
+                    (filterValue === 'custom' && pinType === 'custom')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Reset PIN to default
+        async function resetPinToDefault(memberId, memberName) {
+            if (!confirm(`Reset PIN to default for ${memberName}?\n\nThis will use the last 4 digits of their mobile number.`)) {
+                return;
+            }
+
+            try {
+                // Remove custom PIN entry
+                const { error } = await supabase
+                    .from('member_pins')
+                    .delete()
+                    .eq('member_id', memberId);
+
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                showAlert(`PIN reset to default for ${memberName}`, 'success');
+                
+                // Refresh data
+                await Promise.all([
+                    loadAllPins(),
+                    loadStatistics()
+                ]);
+
+            } catch (error) {
+                console.error('Error resetting PIN:', error);
+                showAlert('Error resetting PIN: ' + error.message, 'error');
+            }
+        }
+
+        // Edit PIN (populate form)
+        function editPin(memberId, memberName, contact) {
+            // Switch to set PIN tab
+            showTab('set-pin');
+            
+            // Populate form
+            document.getElementById('selectedMemberId').value = memberId;
+            document.getElementById('memberSearch').value = `MS${String(memberId).padStart(4, '0')} - ${memberName}`;
+            
+            // Set placeholders
+            const defaultPin = contact.slice(-4);
+            document.getElementById('newPin').placeholder = `Default: ${defaultPin}`;
+            document.getElementById('confirmPin').placeholder = `Default: ${defaultPin}`;
+            
+            showAlert(`Editing PIN for ${memberName}. Form has been populated.`, 'info');
+        }
+
+        // Bulk reset all PINs to default
+        async function bulkResetToDefault() {
+            if (!confirm('⚠️ WARNING: This will reset ALL member PINs to their default values (last 4 digits of mobile).\n\nThis action cannot be undone. Continue?')) {
+                return;
+            }
+
+            if (!confirm('Are you absolutely sure? This will affect ALL members with custom PINs.')) {
+                return;
+            }
+
+            try {
+                // Delete all custom PINs
+                const { error } = await supabase
+                    .from('member_pins')
+                    .delete()
+                    .neq('member_id', 0); // Delete all records
+
+                if (error) throw error;
+
+                showAlert('All PINs have been reset to default values. Members can now login with the last 4 digits of their mobile numbers.', 'success');
+                
+                // Refresh data
+                await Promise.all([
+                    loadAllPins(),
+                    loadStatistics()
+                ]);
+
+                document.getElementById('bulkOperationResult').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✅ Bulk Reset Completed</strong><br>
+                        All custom PINs have been removed. Members will now use default PINs.
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error in bulk reset:', error);
+                showAlert('Error in bulk reset: ' + error.message, 'error');
+            }
+        }
+
+        // Bulk remove custom PINs
+        async function bulkRemoveCustomPins() {
+            if (!confirm('This will remove all custom PINs, making all members use their default PINs (last 4 digits of mobile).\n\nContinue?')) {
+                return;
+            }
+
+            try {
+                // Get count of custom PINs first
+                const { data: customPins, error: countError } = await supabase
+                    .from('member_pins')
+                    .select('member_id');
+
+                if (countError && countError.code !== 'PGRST116') {
+                    throw countError;
+                }
+
+                const customPinCount = customPins ? customPins.length : 0;
+
+                if (customPinCount === 0) {
+                    showAlert('No custom PINs found to remove', 'info');
+                    return;
+                }
+
+                // Delete all custom PINs
+                const { error } = await supabase
+                    .from('member_pins')
+                    .delete()
+                    .neq('member_id', 0); // Delete all records
+
+                if (error) throw error;
+
+                showAlert(`Removed ${customPinCount} custom PINs. All members now use default PINs.`, 'success');
+                
+                // Refresh data
+                await Promise.all([
+                    loadAllPins(),
+                    loadStatistics()
+                ]);
+
+                document.getElementById('bulkOperationResult').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✅ Custom PINs Removed</strong><br>
+                        Removed ${customPinCount} custom PIN(s). All members now use default PINs.
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error removing custom PINs:', error);
+                showAlert('Error removing custom PINs: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize member portal access
+        async function initializeMemberPortal() {
+            if (!confirm('This will ensure all active members can access the member portal with their default PINs.\n\nContinue?')) {
+                return;
+            }
+
+            try {
+                // Get all active members
+                const { data: members, error: membersError } = await supabase
+                    .from('members')
+                    .select('id, name, contact')
+                    .eq('status', 'active');
+
+                if (membersError) throw membersError;
+
+                if (!members || members.length === 0) {
+                    showAlert('No active members found', 'info');
+                    return;
+                }
+
+                showAlert(`Portal access initialized for ${members.length} active members. All can login with default PINs (last 4 digits of mobile).`, 'success');
+                
+                document.getElementById('bulkOperationResult').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✅ Portal Access Initialized</strong><br>
+                        ${members.length} active members can now access the member portal with their default PINs.<br>
+                        <em>Default PIN = Last 4 digits of mobile number</em>
+                    </div>
+                `;
+
+                // Refresh statistics
+                await loadStatistics();
+
+            } catch (error) {
+                console.error('Error initializing portal access:', error);
+                showAlert('Error initializing portal access: ' + error.message, 'error');
+            }
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                // Get total active members
+                const { data: members, error: membersError } = await supabase
+                    .from('members')
+                    .select('id')
+                    .eq('status', 'active');
+
+                if (membersError) throw membersError;
+
+                // Get custom PINs count
+                const { data: customPins, error: pinsError } = await supabase
+                    .from('member_pins')
+                    .select('member_id');
+
+                if (pinsError && pinsError.code !== 'PGRST116') {
+                    throw pinsError;
+                }
+
+                const totalMembers = members ? members.length : 0;
+                const customPinCount = customPins ? customPins.length : 0;
+                const defaultPinCount = totalMembers - customPinCount;
+                const portalReadyCount = totalMembers; // All active members can access portal
+
+                const statsHTML = `
+                    <div class="stats-card" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        <h4>Total Members</h4>
+                        <div class="number">${totalMembers}</div>
+                        <small>Active members in system</small>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                        <h4>Default PINs</h4>
+                        <div class="number">${defaultPinCount}</div>
+                        <small>Using last 4 digits of mobile</small>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        <h4>Custom PINs</h4>
+                        <div class="number">${customPinCount}</div>
+                        <small>Admin-set custom PINs</small>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                        <h4>Portal Ready</h4>
+                        <div class="number">${portalReadyCount}</div>
+                        <small>Can access member portal</small>
+                    </div>
+                `;
+
+                document.getElementById('statisticsCards').innerHTML = statsHTML;
+
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                showAlert('Error loading statistics: ' + error.message, 'error');
+            }
+        }
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected content section
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+
+            // Load data for specific tabs
+            if (tabName === 'view-pins') {
+                loadAllPins();
+            } else if (tabName === 'statistics') {
+                loadStatistics();
+            }
+        }
+
+        // Utility function to show alerts
+        function showAlert(message, type = 'success') {
+            // Remove any existing alerts
+            document.querySelectorAll('.alert').forEach(alert => {
+                if (alert.style.position === 'fixed') {
+                    alert.remove();
+                }
+            });
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                max-width: 500px;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            // Add icon based on type
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            alertDiv.innerHTML = `${icons[type] || '💡'} ${message}`;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Animate in
+            setTimeout(() => {
+                alertDiv.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto dismiss
+            setTimeout(() => {
+                alertDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, type === 'error' ? 6000 : 4000);
+        }
+
+        console.log('Admin PIN Management System loaded successfully!');
+    </script>
+</body>
+</html>

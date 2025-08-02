@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Society Management System</title>
+    <link rel="stylesheet" href="home-dashboard.css">
+    <!-- External JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+    
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>🏛️ Society Management</h1>
+                <p>Complete Financial Solution</p>
+                <P>Developed by Avik Modak</P>
+            </div>
+            
+            <div class="sidebar-menu">
+                <!-- Dashboard -->
+                <div class="menu-section">
+                    <div class="menu-item" data-section="dashboard">
+                        <a href="#" class="menu-link active">
+                            <span class="menu-icon">📊</span>
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Members -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="members">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">👥</span>
+                            <span class="menu-text">Members</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="members-submenu">
+                        <div class="submenu-item" data-section="manage-members">Manage Members</div>
+                    </div>
+                </div>
+
+                <!-- Subscriptions -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="subscriptions">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">💳</span>
+                            <span class="menu-text">Subscriptions</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="subscriptions-submenu">
+                        <div class="submenu-item" data-section="individual-subscription">Individual Payment</div>
+                        <div class="submenu-item" data-section="subscription-history">Payment History</div>
+                    </div>
+                </div>
+
+                <!-- Loans -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="loans">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">💰</span>
+                            <span class="menu-text">Loans</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="loans-submenu">
+                        <div class="submenu-item" data-section="issue-loan">Issue New Loan</div>
+                        <div class="submenu-item" data-section="loan-topup">Loan Top-up</div>
+                        <div class="submenu-item" data-section="loan-repayment">Record Repayment</div>
+                        <div class="submenu-item" data-section="monthly-interest">Monthly Interest</div>
+                        <div class="submenu-item" data-section="active-loans">Active Loans</div>
+                    </div>
+                </div>
+
+                <!-- Fixed Deposits -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="deposits">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">🏦</span>
+                            <span class="menu-text">Fixed Deposits</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="deposits-submenu">
+                        <div class="submenu-item" data-section="create-fd">Create FD</div>
+                        <div class="submenu-item" data-section="fd-list">FD List</div>
+                        <div class="submenu-item" data-section="fd-interest-calc">Interest Calculation</div>
+                    </div>
+                </div>
+
+                <!-- Reports -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="reports">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">📈</span>
+                            <span class="menu-text">Reports</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="reports-submenu">
+                        <div class="submenu-item" data-section="subscription-report">Collection Report</div>
+                        <div class="submenu-item" data-section="income-statement">Income Statement</div>
+                        <div class="submenu-item" data-section="loan-statement">Loan Statement</div>
+                        <div class="submenu-item" data-section="profit-distribution">Profit Distribution</div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="menu-section">
+                    <div class="menu-item" data-toggle="settings">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon">⚙️</span>
+                            <span class="menu-text">Settings</span>
+                            <span class="menu-arrow">▶</span>
+                        </a>
+                    </div>
+                    <div class="submenu" id="settings-submenu">
+                        <div class="submenu-item" data-section="quarter-settings">Quarter Settings</div>
+                        <div class="submenu-item" data-section="data-management">Data Management</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">☰</button>
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="exportDatabase()" title="Download your data as a backup file">
+                        💾 Export Data
+                    </button>
+                    <button class="btn btn-warning" onclick="document.getElementById('importFile').click()" title="Load data from a backup file">
+                        📁 Import Data
+                    </button>
+                    <input type="file" id="importFile" accept=".db,.sqlite" style="display: none;" onchange="importDatabase(event)">
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div class="content-section active" id="dashboard">
+                    <div class="alert alert-success">
+                        <strong>📋 Data Persistence:</strong> Your data is stored temporarily in browser memory. 
+                        <strong>Click "Export Data" above to save your information to a file.</strong> 
+                        Use "Import Data" to restore previously saved data when you reopen the application.
+                        <br><br>
+                        <strong>📊 Financial Overview:</strong><br>
+                        <strong>Net Cash:</strong> Member Subscriptions (Refundable) + Cash from FDs + Loan Repayments - Loan Disbursements<br>
+                        <strong>Liabilities:</strong> FD Principal + FD Interest Earned + Member Subscriptions (Refundable)<br>
+                        <strong>Current Month P&L:</strong> Interest Income vs FD Interest Expense (from quarterly calculations)
+                    </div>
+                    
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h4>Active Members</h4>
+                            <div class="amount" id="totalMembers">0</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                            <h4>Net Cash Position</h4>
+                            <div class="amount" id="netCashPosition">₹0</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <h4>Total Liabilities</h4>
+                            <div class="amount" id="totalLiabilities">₹0</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                            <h4>Active Loans</h4>
+                            <div class="amount" id="activeLoans">₹0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Income-Expenditure Summary (Current Month)</h3>
+                        <div id="dashboardIncomeExpenditure">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div class="summary-card" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                                    <h4>Total Income</h4>
+                                    <div class="amount" id="currentMonthIncome">₹0</div>
+                                    <small style="opacity: 0.8;">Interest Received + Accrued</small>
+                                </div>
+                                <div class="summary-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                                    <h4>Total Expenditure</h4>
+                                    <div class="amount" id="currentMonthExpenditure">₹0</div>
+                                    <small style="opacity: 0.8;">FD Interest Payable</small>
+                                </div>
+                                <div class="summary-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                                    <h4>Net Profit/Loss</h4>
+                                    <div class="amount" id="currentMonthProfit">₹0</div>
+                                    <small style="opacity: 0.8;">Income - Expenditure</small>
+                                </div>
+                            </div>
+                            <div style="text-align: center;">
+                                <button type="button" class="btn btn-primary" onclick="switchToReportsTab()">View Detailed Income-Expenditure Statement</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Recent Transactions</h3>
+                        <div id="recentTransactions">Loading...</div>
+                    </div>
+                </div>
+
+
+                <!-- Manage Members Section -->
+                <div class="content-section" id="manage-members">
+                    <div class="card">
+                        <h3>Members List</h3>
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div class="form-col">
+                                <label for="memberStatusFilter">Filter by Status</label>
+                                <select id="memberStatusFilter" onchange="filterMembersByStatus()">
+                                    <option value="">All Members</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="suspended">Suspended Only</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <!-- Empty column -->
+                            </div>
+                        </div>
+                        <table id="membersTable">
+                            <thead>
+                                <tr>
+                                    <th>Member ID</th>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Individual Subscription Section -->
+                <div class="content-section" id="individual-subscription">
+                    <div class="card">
+                        <h3>Record Individual Subscription Payment</h3>
+                        <p><em>Add subscription for a specific member</em></p>
+                        <form id="subscriptionForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="subMonth">Select Month *</label>
+                                    <input type="month" id="subMonth" required>
+                                </div>
+                                <div class="form-col">
+                                    <label for="subMemberSearch">Search Member *</label>
+                                    <div class="search-container">
+                                        <input type="text" id="subMemberSearch" placeholder="Type member name to search..." autocomplete="off" required>
+                                        <input type="hidden" id="subMemberId" required>
+                                        <div id="subMemberResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="subAmount">Subscription Amount *</label>
+                                    <input type="number" id="subAmount" required placeholder="Enter subscription amount">
+                                </div>
+                                <div class="form-col">
+                                    <label for="subDate">Payment Date *</label>
+                                    <input type="date" id="subDate" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Record Individual Subscription</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Subscription History Section -->
+                <div class="content-section" id="subscription-history">
+                    <div class="card">
+                        <h3>Monthly Subscription Filter</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="filterMonth">Filter by Month</label>
+                                <input type="month" id="filterMonth" onchange="filterSubscriptions()">
+                            </div>
+                            <div class="form-col" style="display: flex; align-items: flex-end;">
+                                <button type="button" class="btn btn-primary" onclick="showAllSubscriptions()">Show All</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Subscription Payments History</h3>
+                        <table id="subscriptionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Member ID</th>
+                                    <th>Member Name</th>
+                                    <th>Month</th>
+                                    <th>Amount</th>
+                                    <th>Payment Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Issue Loan Section -->
+                <div class="content-section" id="issue-loan">
+                    <div class="card">
+                        <h3>Issue New Loan</h3>
+                        <form id="loanForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="loanMemberSearch">Search Member *</label>
+                                    <div class="search-container">
+                                        <input type="text" id="loanMemberSearch" placeholder="Type member name to search..." autocomplete="off" required>
+                                        <input type="hidden" id="loanMemberId" required>
+                                        <div id="loanMemberResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <label for="loanAmount">Loan Amount</label>
+                                    <input type="number" id="loanAmount" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="loanDate">Loan Date</label>
+                                    <input type="date" id="loanDate" required>
+                                </div>
+                                <div class="form-col">
+                                    <!-- Empty column for layout balance -->
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Interest Rate Type *</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="progressiveRate" name="interestType" value="progressive" checked onchange="toggleInterestRateInput()">
+                                    <label for="progressiveRate">
+                                        Progressive Rate (2% up to ₹2,00,000 + 3% above ₹2,00,000)
+                                    </label>
+                                </div>
+                                <div class="radio-group">
+                                    <input type="radio" id="flatRate" name="interestType" value="flat" onchange="toggleInterestRateInput()">
+                                    <label for="flatRate">
+                                        Flat Rate (Custom rate for entire amount)
+                                    </label>
+                                </div>
+                                <div class="radio-group">
+                                    <input type="radio" id="zeroRate" name="interestType" value="zero" onchange="toggleInterestRateInput()">
+                                    <label for="zeroRate">
+                                        0% Interest Rate (No interest)
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" id="manualRateGroup" style="display: none;">
+                                <label for="manualInterestRate">Enter Interest Rate (% per month)</label>
+                                <input type="number" id="manualInterestRate" step="0.1" placeholder="Enter monthly interest rate">
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <strong>📋 Loan Policy & Interest Information:</strong><br>
+                                • <strong>One Loan Per Member:</strong> Each member can have only ONE active loan at a time<br>
+                                • <strong>Progressive:</strong> 2% per month up to ₹2,00,000, then 3% per month for amount above<br>
+                                • <strong>Flat Rate:</strong> Your custom rate applied to entire loan amount<br>
+                                • <strong>Zero Rate:</strong> No interest charged<br>
+                                • <strong>Interest Calculation:</strong> Calculated ONLY on principal balance (not on unpaid interest)<br>
+                                • <strong>Unpaid Interest:</strong> Carries forward month to month but does NOT earn additional interest<br>
+                                • <strong>Monthly Posting:</strong> Interest calculated and posted on 1st of every month<br>
+                                • <strong>New Loan:</strong> Clear existing loan completely before applying for a new one
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Issue Loan</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loan Top-up Section -->
+                <div class="content-section" id="loan-topup">
+                    <div class="card">
+                        <h3>Increase Existing Loan</h3>
+                        <p><em>Add additional amount to an existing active loan (Top-up)</em></p>
+                        <form id="loanTopupForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="topupLoanSearch">Search Active Loan *</label>
+                                    <div class="search-container">
+                                        <input type="text" id="topupLoanSearch" placeholder="Type loan ID or member name to search..." autocomplete="off" required>
+                                        <input type="hidden" id="topupLoanId" required>
+                                        <div id="topupLoanResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <label for="topupAmount">Additional Amount</label>
+                                    <input type="number" id="topupAmount" required placeholder="Enter additional loan amount">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="topupDate">Top-up Date</label>
+                                    <input type="date" id="topupDate" required>
+                                </div>
+                                <div class="form-col">
+                                    <!-- Empty column -->
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <strong>📋 Loan Top-up Information:</strong><br>
+                                • Adds additional amount to existing loan account<br>
+                                • Uses same interest rate type as original loan<br>
+                                • Principal balance increases, maintaining single loan account<br>
+                                • Interest calculated on total principal balance going forward
+                            </div>
+                            
+                            <button type="submit" class="btn btn-warning">💰 Top-up Loan</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loan Repayment Section -->
+                <div class="content-section" id="loan-repayment">
+                    <div class="card">
+                        <h3>Record Loan Repayment</h3>
+                        <form id="repaymentForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="repayLoanSearch">Search Active Loan *</label>
+                                    <div class="search-container">
+                                        <input type="text" id="repayLoanSearch" placeholder="Type loan ID or member name to search..." autocomplete="off" required>
+                                        <input type="hidden" id="repayLoanId" required>
+                                        <div id="repayLoanResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <label for="principalAmount">Principal Amount</label>
+                                    <input type="number" id="principalAmount" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="interestAmount">Interest Amount</label>
+                                    <input type="number" id="interestAmount" required>
+                                </div>
+                                <div class="form-col">
+                                    <label for="repaymentDate">Repayment Date</label>
+                                    <input type="date" id="repaymentDate" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Record Repayment</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Monthly Interest Section -->
+                <div class="content-section" id="monthly-interest">
+                    <div class="card">
+                        <h3>Monthly Interest Calculation</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="interestMonth">Select Month for Interest Calculation</label>
+                                <input type="month" id="interestMonth" required>
+                            </div>
+                            <div class="form-col" style="display: flex; align-items: flex-end;">
+                                <button type="button" class="btn btn-warning" onclick="calculateMonthlyInterest()">Calculate Interest for Month</button>
+                            </div>
+                        </div>
+                        <div id="monthlyInterestResults"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Post Monthly Interest to Loans</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="postInterestMonth">Select Month for Interest Posting</label>
+                                <input type="month" id="postInterestMonth" required>
+                            </div>
+                            <div class="form-col" style="display: flex; align-items: flex-end;">
+                                <button type="button" class="btn btn-success" onclick="postMonthlyInterest()">Post Interest to All Loans</button>
+                            </div>
+                        </div>
+                        <div id="postInterestResults"></div>
+                    </div>
+                </div>
+
+                <!-- Active Loans Section -->
+                <div class="content-section" id="active-loans">
+                    <div class="card">
+                        <h3>Active Loans</h3>
+                        <table id="loansTable">
+                            <thead>
+                                <tr>
+                                    <th>Loan ID</th>
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Interest Type</th>
+                                    <th>Rate</th>
+                                    <th>Outstanding</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Create FD Section -->
+                <div class="content-section" id="create-fd">
+                    <div class="card">
+                        <h3>Create Fixed Deposit</h3>
+                        <form id="depositForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="fdMemberSearch">Search Member *</label>
+                                    <div class="search-container">
+                                        <input type="text" id="fdMemberSearch" placeholder="Type member name to search..." autocomplete="off" required>
+                                        <input type="hidden" id="fdMemberId" required>
+                                        <div id="fdMemberResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <label for="fdAmount">Deposit Amount *</label>
+                                    <input type="number" id="fdAmount" required placeholder="Enter deposit amount">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="fdTenure">Tenure (months, max 12) *</label>
+                                    <input type="number" id="fdTenure" max="12" min="1" required placeholder="Enter tenure in months">
+                                </div>
+                                <div class="form-col">
+                                    <label for="fdDate">Deposit Date *</label>
+                                    <input type="date" id="fdDate" required>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <strong>📋 Fixed Deposit Information:</strong><br>
+                                • Maximum tenure: 12 months<br>
+                                • Interest calculation method will be defined separately<br>
+                                • Maturity date will be calculated automatically based on tenure<br>
+                                • All fixed deposits are subject to society's interest calculation policy
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Create Fixed Deposit</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- FD List Section -->
+                <div class="content-section" id="fd-list">
+                    <div class="card">
+                        <h3>Fixed Deposits</h3>
+                        <table id="depositsTable">
+                            <thead>
+                                <tr>
+                                    <th>FD ID</th>
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Tenure</th>
+                                    <th>Deposit Date</th>
+                                    <th>Maturity Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- FD Interest Calculation Section -->
+                <div class="content-section" id="fd-interest-calc">
+                    <div class="card">
+                        <h3>Quarterly FD Interest Calculation</h3>
+                        <p><em>Calculate quarterly interest for all fixed deposits based on profit-sharing model</em></p>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="fdInterestYear">Select Year</label>
+                                <input type="number" id="fdInterestYear" min="2020" max="2030" required>
+                            </div>
+                            <div class="form-col">
+                                <label for="fdInterestQuarter">Select Quarter</label>
+                                <select id="fdInterestQuarter" required>
+                                    <option value="">Select Quarter</option>
+                                    <option value="Q1">Quarter 1</option>
+                                    <option value="Q2">Quarter 2</option>
+                                    <option value="Q3">Quarter 3</option>
+                                    <option value="Q4">Quarter 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <button type="button" class="btn btn-primary" onclick="calculateQuarterlyFDInterest()">Calculate Quarterly Interest</button>
+                            </div>
+                            <div class="form-col">
+                                <button type="button" class="btn btn-success" onclick="postQuarterlyFDInterest()" id="postFDInterestBtn" style="display: none;">Post Interest to FDs</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <strong>📋 FD Interest Calculation Formula:</strong><br>
+                            Interest = (Individual FD Balance at Quarter Start) ÷ (Total Subscriptions till Quarter End + Total FD Balance till Quarter End) × (Total Loan Interest Repaid till Quarter End)<br><br>
+                            <strong>Process:</strong><br>
+                            • Interest calculated quarterly and added to principal<br>
+                            • Based on profit-sharing from loan interest income<br>
+                            • Quarter definitions can be set in Settings<br>
+                            • System automatically handles year transitions for quarters
+                        </div>
+                    </div>
+
+                    <div class="card" id="fdInterestResults" style="display: none;">
+                        <h3>Quarterly FD Interest Calculation Results</h3>
+                        <div id="fdInterestSummary"></div>
+                        <div id="fdInterestTable"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>FD Interest History</h3>
+                        <button type="button" class="btn btn-primary" onclick="loadFDInterestHistory()">Load Interest History</button>
+                        <div id="fdInterestHistory"></div>
+                    </div>
+                </div>
+
+                <!-- Collection Report Section -->
+                <div class="content-section" id="subscription-report">
+                    <div class="card">
+                        <h3>Monthly Subscription Collection Report</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="reportMonth">Select Month</label>
+                                <input type="month" id="reportMonth">
+                            </div>
+                            <div class="form-col" style="display: flex; align-items: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-primary" onclick="generateDueReport()">Generate Report</button>
+                                <button type="button" class="btn btn-success" onclick="exportSubscriptionReportPDF()" id="exportSubReportBtn" style="display: none;">📄 Export PDF</button>
+                            </div>
+                        </div>
+                        <div id="dueReport"></div>
+                    </div>
+                </div>
+
+                <!-- Income Statement Section -->
+                <div class="content-section" id="income-statement">
+                    <div class="card">
+                        <h3>Income-Expenditure Statement</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="ieFromDate">From Date</label>
+                                <input type="date" id="ieFromDate" required>
+                            </div>
+                            <div class="form-col">
+                                <label for="ieToDate">To Date</label>
+                                <input type="date" id="ieToDate" required>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="generateIncomeExpenditureStatement()">Generate Statement</button>
+                        <div id="incomeExpenditureStatement"></div>
+                    </div>
+                </div>
+
+                <!-- Loan Statement Section -->
+                <div class="content-section" id="loan-statement">
+                    <div class="card">
+                        <h3>Member Loan Statement</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="loanStatementMemberSearch">Search Member</label>
+                                <div class="search-container">
+                                    <input type="text" id="loanStatementMemberSearch" placeholder="Type member name to search..." autocomplete="off">
+                                    <input type="hidden" id="loanStatementMember">
+                                    <div id="loanStatementMemberResults" class="search-results"></div>
+                                </div>
+                            </div>
+                            <div class="form-col" style="display: flex; align-items: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-primary" onclick="generateLoanStatement()">Generate Statement</button>
+                                <button type="button" class="btn btn-success" onclick="generateDetailedLoanLedger()">📊 Detailed Ledger</button>
+                                <button type="button" class="btn btn-warning" onclick="exportLoanLedgerPDF()" id="exportLoanLedgerBtn" style="display: none;">📄 Export PDF</button>
+                            </div>
+                        </div>
+                        <div id="loanStatement"></div>
+                        <div id="detailedLoanLedger"></div>
+                    </div>
+                </div>
+
+                <!-- Profit Distribution Section -->
+                <div class="content-section" id="profit-distribution">
+                    <div class="card">
+                        <h3>Final Profit Distribution</h3>
+                        <p><em>Distribute net profit among members based on their subscription contributions during the selected period. <strong>Note:</strong> Ensure FD quarterly interest calculations have been posted before running this report for accurate profit calculations.</em></p>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="payoutFromDate">From Date</label>
+                                <input type="date" id="payoutFromDate" required>
+                            </div>
+                            <div class="form-col">
+                                <label for="payoutToDate">To Date</label>
+                                <input type="date" id="payoutToDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <button type="button" class="btn btn-primary" onclick="calculateProfitDistribution()">Calculate Profit Distribution</button>
+                            </div>
+                            <div class="form-col">
+                                <button type="button" class="btn btn-success" onclick="exportPayoutReportPDF()" id="exportPayoutBtn" style="display: none;">📄 Export as PDF</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <strong>📋 Profit Distribution Rules:</strong><br>
+                            • Net profit = Total Interest Income - FD Interest Expenses for the period<br>
+                            • FD Interest Expenses are taken from actual quarterly calculations<br>
+                            • Each member's share = (Member's total subscriptions ÷ All subscriptions) × Net profit<br>
+                            • Only members who paid subscriptions during the period are eligible<br>
+                            • Distribution is proportional to contribution amount<br>
+                            • Ensure FD quarterly interest has been calculated and posted before running this report
+                        </div>
+                    </div>
+
+                    <div class="card" id="profitDistributionResults" style="display: none;">
+                        <h3>Profit Distribution Report</h3>
+                        <div id="profitDistributionSummary"></div>
+                        <div id="profitDistributionTable"></div>
+                    </div>
+                </div>
+
+                <!-- Quarter Settings Section -->
+                <div class="content-section" id="quarter-settings">
+                    <div class="card">
+                        <h3>Quarter Settings</h3>
+                        <p><em>Define the start and end months for each quarter</em></p>
+                        
+                        <form id="quarterSettingsForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="q1Start">Quarter 1 - Start Month</label>
+                                    <select id="q1Start" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label for="q1End">Quarter 1 - End Month</label>
+                                    <select id="q1End" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="q2Start">Quarter 2 - Start Month</label>
+                                    <select id="q2Start" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label for="q2End">Quarter 2 - End Month</label>
+                                    <select id="q2End" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="q3Start">Quarter 3 - Start Month</label>
+                                    <select id="q3Start" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label for="q3End">Quarter 3 - End Month</label>
+                                    <select id="q3End" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="q4Start">Quarter 4 - Start Month</label>
+                                    <select id="q4Start" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-col">
+                                    <label for="q4End">Quarter 4 - End Month</label>
+                                    <select id="q4End" required>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Save Quarter Settings</button>
+                        </form>
+                        
+                        <div class="alert alert-success" style="margin-top: 20px;">
+                            <strong>📋 Quarter Settings Information:</strong><br>
+                            • Quarters can span across calendar years (e.g., Dec-Feb, Jan-Mar)<br>
+                            • Each quarter can be any 3 consecutive months<br>
+                            • Default example: Q1: April-June, Q2: July-September, Q3: October-December, Q4: January-March<br>
+                            • Customize based on your society's financial year start month<br>
+                            <em>The system automatically handles year transitions in quarter calculations</em>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Current Quarter Settings</h3>
+                        <div id="currentQuarterSettings">
+                            Loading quarter settings...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management Section -->
+                <div class="content-section" id="data-management">
+                    <div class="card">
+                        <h3>Data Management</h3>
+                        <p><em>Export and import your society data for backup and restore purposes</em></p>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <h4>Export Database</h4>
+                                <p>Download your complete society data as a backup file</p>
+                                <button class="btn btn-success" onclick="exportDatabase()">
+                                    💾 Export Database
+                                </button>
+                            </div>
+                            <div class="form-col">
+                                <h4>Import Database</h4>
+                                <p>Restore previously exported society data</p>
+                                <button class="btn btn-warning" onclick="document.getElementById('importFileSettings').click()">
+                                    📁 Import Database
+                                </button>
+                                <input type="file" id="importFileSettings" accept=".db,.sqlite" style="display: none;" onchange="importDatabase(event)">
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success" style="margin-top: 20px;">
+                            <strong>📋 Data Management Information:</strong><br>
+                            • Regular exports are recommended for data safety<br>
+                            • Import will replace ALL current data with backup data<br>
+                            • Data is stored temporarily in browser memory<br>
+                            • Always keep multiple backup files in safe locations
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Member Modal -->
+    <div id="editMemberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Member Details</h3>
+                <span class="close" onclick="closeEditMemberModal()">&times;</span>
+            </div>
+            <form id="editMemberForm">
+                <input type="hidden" id="editMemberId">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="editMemberName">Member Name *</label>
+                        <input type="text" id="editMemberName" required>
+                    </div>
+                    <div class="form-col">
+                        <label for="editMemberContact">Contact Number *</label>
+                        <input type="tel" id="editMemberContact" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col">
+                        <button type="submit" class="btn btn-primary">Update Member</button>
+                    </div>
+                    <div class="form-col">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditMemberModal()">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+  
+</body>
+</html>
+                    

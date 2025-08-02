@@ -1,0 +1,117 @@
+# Netlify Redirects Configuration
+# Redirects and rewrites for the Society Management System
+
+# SPA (Single Page Application) Redirects
+# Serve index.html for any path that doesn't match a file
+/*    /index.html   200
+
+# PWA Offline Fallback
+/offline   /index.html   200
+
+# Admin Panel Routes
+/admin   /admin.html   200
+/admin/*   /admin.html   200
+
+# Member Management Routes
+/member-management   /member-management.html   200
+/member-management/*   /member-management.html   200
+
+# Data Admin Routes
+/data-admin   /data-admin.html   200
+/data-admin/*   /data-admin.html   200
+
+# Member Portal Routes
+/member-portal   /member-portal.html   200
+/member-portal/*   /member-portal.html   200
+
+# Main Dashboard Routes
+/home   /home.html   200
+/home/*   /home.html   200
+/dashboard   /home.html   200
+/dashboard/*   /home.html   200
+
+# Legacy URL Redirects (if migrating from old system)
+/old-admin   /admin.html   301
+/old-portal   /member-portal.html   301
+/legacy/*   /index.html   301
+
+# API Routes (if using Netlify Functions in future)
+/api/*   /.netlify/functions/:splat   200
+
+# Security Redirects
+# Block access to sensitive files
+/.env*   /   404
+/config/*   /   404
+/admin-password*   /   404
+/*.backup   /   404
+/*.bak   /   404
+/*.log   /   404
+
+# PWA Routes
+/manifest.json   /manifest.json   200
+/sw.js   /sw.js   200
+/offline.html   /index.html   200
+
+# Icon Routes
+/icon-*   /icons/:splat   200
+/apple-touch-icon*   /icons/apple-touch-icon.png   200
+/favicon.ico   /icons/favicon.ico   200
+
+# Social Media and SEO
+/robots.txt   /robots.txt   200
+/sitemap.xml   /sitemap.xml   200
+
+# Health Check Routes
+/health   /   200
+/status   /   200
+/ping   /   200
+
+# Error Pages
+/404   /index.html   404
+/500   /index.html   500
+
+# Force HTTPS (additional security)
+http://society-management.netlify.app/*   https://society-management.netlify.app/:splat   301!
+http://www.society-management.netlify.app/*   https://society-management.netlify.app/:splat   301!
+
+# Redirect www to non-www (if custom domain)
+# https://www.yourdomain.com/*   https://yourdomain.com/:splat   301!
+
+# Custom Domain Redirects (update when you have a custom domain)
+# http://yourdomain.com/*   https://yourdomain.com/:splat   301!
+# http://www.yourdomain.com/*   https://yourdomain.com/:splat   301!
+
+# Maintenance Mode (uncomment to enable)
+# /*   /maintenance.html   503
+
+# Regional Redirects (if needed for multi-region deployment)
+# /in/*   https://india.yourdomain.com/:splat   302
+# /us/*   https://usa.yourdomain.com/:splat   302
+
+# A/B Testing Redirects (if needed)
+# /beta   /index.html?version=beta   200
+# /test/*   /index.html?test=:splat   200
+
+# Mobile App Deep Links (if mobile app is created)
+# /app/*   /index.html?redirect=:splat   200
+
+# Short URLs (if implementing URL shortener)
+# /s/*   /index.html?short=:splat   200
+
+# Analytics and Tracking
+# /track/*   /.netlify/functions/analytics   200
+# /event/*   /.netlify/functions/track-event   200
+
+# Rate Limiting (using Netlify Edge Functions when available)
+# /api/auth/*   /.netlify/edge-functions/rate-limit   200
+
+# Admin Security (additional layer)
+/admin.html   /admin.html   200   Role=admin
+/data-admin.html   /data-admin.html   200   Role=super-admin
+
+# Webhook Endpoints (if integrating with external services)
+# /webhooks/*   /.netlify/functions/webhook-handler   200
+
+# Backup and Export Routes
+# /backup/*   /.netlify/functions/backup-handler   200   Role=admin
+# /export/*   /.netlify/functions/export-handler   200   Role=admin

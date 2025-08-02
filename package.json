@@ -1,0 +1,80 @@
+{
+  "name": "society-management-system",
+  "version": "1.2.0",
+  "description": "Complete Financial Solution for Cooperative Societies",
+  "type": "module",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "build": "npm run build:production",
+    "build:production": "node scripts/build-production.js",
+    "build:development": "echo 'Development build - no build step needed for static site'",
+    "preview": "npm run serve",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'Linting HTML, CSS, and JS files'",
+    "format": "echo 'Formatting code'",
+    "validate": "node scripts/validate-env.js",
+    "deploy": "npm run build && echo 'Ready for deployment'",
+    "postinstall": "echo 'Society Management System dependencies installed'"
+  },
+  "keywords": [
+    "society-management",
+    "cooperative",
+    "financial-system",
+    "pwa",
+    "member-management",
+    "loans",
+    "deposits",
+    "subscriptions"
+  ],
+  "author": "Avik Modak",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/society-management-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/society-management-system/issues"
+  },
+  "homepage": "https://your-app-name.netlify.app",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "files": [
+    "*.html",
+    "*.css",
+    "*.js",
+    "manifest.json",
+    "sw.js",
+    "netlify.toml",
+    "icons/",
+    "assets/",
+    "screenshots/"
+  ],
+  "netlify": {
+    "build": {
+      "publish": ".",
+      "command": "npm run build",
+      "environment": {
+        "NODE_VERSION": "18",
+        "NPM_VERSION": "8"
+      }
+    }
+  },
+  "workspaces": [],
+  "private": false,
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/yourusername"
+  }
+}

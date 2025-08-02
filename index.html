@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Management System</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Complete Financial Solution for Cooperative Societies">
+    <meta name="keywords" content="society management, cooperative, finance, loans, deposits">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Society Management">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons for different platforms -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#667eea">
+    <link rel="shortcut icon" href="/favicon.ico">
+<style>
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f1419;
+    color: #ffffff;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Main Container */
+.container {
+    max-width: 100%;
+    width: 100%;
+    background: #0f1419;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+    background: #1a1f2e;
+    border-bottom: 1px solid #2a3441;
+    color: white;
+    padding: 20px 40px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 1.8em;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.header p {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-bottom: 0;
+    color: #8892b0;
+}
+
+.developer-credit {
+    display: none;
+}
+
+/* User Profile Section */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-box {
+    background: #2a3441;
+    border: 1px solid #3a4553;
+    border-radius: 8px;
+    padding: 8px 15px;
+    color: #8892b0;
+    width: 250px;
+    font-size: 14px;
+}
+
+.search-box::placeholder {
+    color: #5a6573;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.user-details h4 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.user-details p {
+    font-size: 12px;
+    color: #8892b0;
+    margin: 0;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 70px;
+    height: 100vh;
+    background: #1a1f2e;
+    border-right: 1px solid #2a3441;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 100;
+}
+
+.sidebar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #8892b0;
+    font-size: 18px;
+}
+
+.sidebar-icon:hover,
+.sidebar-icon.active {
+    background: #2a3441;
+    color: #64ffda;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 70px;
+    padding: 0;
+    background: #0f1419;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 30px 40px;
+}
+
+.stat-card {
+    background: #1a1f2e;
+    border: 1px solid #2a3441;
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: #3a4553;
+    transform: translateY(-2px);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.stat-title {
+    font-size: 14px;
+    color: #8892b0;
+    font-weight: 500;
+}
+
+.stat-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(100, 255, 218, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64ffda;
+    font-size: 16px;
+    margin-left: auto;
+}
+
+.stat-value {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.stat-change {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-change.positive {
+    color: #4ade80;
+}
+
+.stat-change.negative {
+    color: #f87171;
+}
+
+.stat-change.neutral {
+    color: #8892b0;
+}
+
+/* Chart Section */
+.charts-section {
+    padding: 0 40px 30px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.chart-card {
+    background: #1a1f2e;
+    border: 1px solid #2a3441;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.chart-tabs {
+    display: flex;
+    gap: 15px;
+}
+
+.chart-tab {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    background: transparent;
+    border: none;
+    color: #8892b0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chart-tab.active {
+    background: #2a3441;
+    color: #64ffda;
+}
+
+.chart-placeholder {
+    height: 300px;
+    background: linear-gradient(135deg, rgba(100, 255, 218, 0.05), rgba(103, 186, 170, 0.05));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8892b0;
+    font-size: 14px;
+    border: 1px dashed #2a3441;
+}
+
+/* Module Cards (keeping original structure) */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 40px;
+    margin-left: 70px;
+}
+
+.module-card {
+    background: #1a1f2e;
+    border: 1px solid #2a3441;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+    border-color: #64ffda;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.module-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.module-card:hover::before {
+    opacity: 1;
+}
+
+.module-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    display: block;
+    color: #64ffda;
+}
+
+.module-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.module-description {
+    color: #8892b0;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.module-features {
+    background: rgba(42, 52, 65, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.module-features ul {
+    list-style: none;
+    padding: 0;
+}
+
+.module-features li {
+    padding: 4px 0;
+    font-size: 12px;
+    color: #8892b0;
+}
+
+.module-features li:before {
+    content: "✓ ";
+    color: #4ade80;
+    font-weight: bold;
+}
+
+.access-level {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+}
+
+.admin-access {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.member-access {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.super-admin-access {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Footer */
+.footer {
+    background: #1a1f2e;
+    border-top: 1px solid #2a3441;
+    color: #8892b0;
+    text-align: center;
+    padding: 30px 40px;
+    margin-left: 70px;
+}
+
+.footer h3 {
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.footer p {
+    opacity: 0.8;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.contact-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #2a3441;
+}
+
+/* Modal Styles (Dark Theme) */
+.modal {
+    background-color: rgba(15, 20, 25, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background-color: #1a1f2e;
+    border: 1px solid #2a3441;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2a3441, #1a1f2e);
+    border-bottom: 1px solid #2a3441;
+}
+
+.modal-body {
+    background: #1a1f2e;
+}
+
+.modal-body p {
+    color: #8892b0;
+}
+
+.form-group label {
+    color: #ffffff;
+}
+
+.form-group input {
+    background: #0f1419;
+    border: 2px solid #2a3441;
+    color: #ffffff;
+}
+
+.form-group input:focus {
+    border-color: #64ffda;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+}
+
+.auth-btn {
+    background: linear-gradient(135deg, #64ffda, #4db6ac);
+    color: #0f1419;
+    font-weight: 700;
+}
+
+.auth-btn:hover:not(:disabled) {
+    box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+}
+
+.auth-btn:disabled {
+    background: #2a3441;
+    color: #8892b0;
+}
+
+.error-message {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .sidebar {
+        display: none;
+    }
+    
+    .modules-grid {
+        margin-left: 0;
+    }
+    
+    .footer {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .user-profile {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .search-box {
+        width: 200px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    .charts-section {
+        padding: 0 20px 20px;
+    }
+    
+    .modules-section {
+        padding: 0 20px 30px;
+    }
+    
+    .modules-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 15px;
+        margin-left: 0;
+    }
+    
+    .footer {
+        padding: 20px;
+    }
+}
+
+/* Additional Utility Classes */
+.text-success { color: #4ade80; }
+.text-danger { color: #f87171; }
+.text-warning { color: #fbbf24; }
+.text-info { color: #64ffda; }
+.text-muted { color: #8892b0; }
+
+/* Animation Classes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, #2a3441 25%, #3a4553 50%, #2a3441 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏛️ Society Management System</h1>
+            <p>Complete Financial Solution</p>
+            <div class="developer-credit">Developed by Avik Modak</div>
+        </div>
+
+        <!-- Modules Grid -->
+        <div class="modules-grid">
+            <!-- Main Operations Module -->
+            <div class="module-card" onclick="accessAdminPanel('main-operations', 'home.html')">
+                <div class="module-icon">📊</div>
+                <div class="module-title">Main Operations</div>
+                <div class="module-description">
+                    Complete society management dashboard with all core functionalities
+                </div>
+                <div class="module-features">
+                    <ul>
+                        <li>Member Management</li>
+                        <li>Subscription Tracking</li>
+                        <li>Loan Management</li>
+                        <li>Fixed Deposits</li>
+                        <li>Financial Reports</li>
+                        <li>Profit Distribution</li>
+                    </ul>
+                </div>
+                <div class="access-level admin-access">Admin Access</div>
+            </div>
+
+            <!-- Member Portal -->
+            <a href="member-portal.html" class="module-card">
+                <div class="module-icon">📱</div>
+                <div class="module-title">Member Portal</div>
+                <div class="module-description">
+                    Mobile-optimized portal for members to view their account details
+                </div>
+                <div class="module-features">
+                    <ul>
+                        <li>View Subscription History</li>
+                        <li>Check Loan Status</li>
+                        <li>Account Summary</li>
+                        <li>Detailed Loan Ledger</li>
+                        <li>Mobile-Friendly Interface</li>
+                        <li>PIN-based Login</li>
+                    </ul>
+                </div>
+                <div class="access-level member-access">Member Access</div>
+            </a>
+
+            <!-- Admin PIN Management -->
+            <div class="module-card" onclick="accessAdminPanel('pin-management', 'admin.html')">
+                <div class="module-icon">🔐</div>
+                <div class="module-title">Admin PIN Management</div>
+                <div class="module-description">
+                    Manage member login PINs for the member portal access
+                </div>
+                <div class="module-features">
+                    <ul>
+                        <li>Set Custom PINs</li>
+                        <li>Reset to Default PINs</li>
+                        <li>Bulk PIN Operations</li>
+                        <li>PIN Statistics</li>
+                        <li>Member Search</li>
+                        <li>Portal Access Control</li>
+                    </ul>
+                </div>
+                <div class="access-level admin-access">Admin Access</div>
+            </div>
+
+                        <!-- Members & Subscription Management -->
+            <div class="module-card" onclick="accessAdminPanel('member-management', 'member-management.html')">
+                <div class="module-icon">👥</div>
+                <div class="module-title">Members & Subscription Management</div>
+                <div class="module-description">
+                    Comprehensive portal for member & subscription management
+                </div>
+                <div class="module-features">
+                    <ul>
+                        <li>Complete Member Management</li>
+                        <li>Subscription Management</li>
+                        <li>Bulk Subscription Entry</li>
+                    </ul>
+                </div>
+                <div class="access-level admin-access">Admin Access</div>
+            </div>
+            <!-- Data Administration -->
+            <div class="module-card" onclick="accessAdminPanel('data-admin', 'data-admin.html')">
+                <div class="module-icon">🗑️</div>
+                <div class="module-title">Data Administration</div>
+                <div class="module-description">
+                    Advanced data management and deletion tools for database maintenance
+                </div>
+                <div class="module-features">
+                    <ul>
+                        <li>Selective Data Deletion</li>
+                        <li>Bulk Operations</li>
+                        <li>Database Statistics</li>
+                        <li>Data Export/Backup</li>
+                        <li>Emergency Reset Tools</li>
+                        <li>Safety Confirmations</li>
+                    </ul>
+                </div>
+                <div class="access-level super-admin-access">Super Admin</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>🛡️ Security & Access Information</h3>
+            <p>
+                This system uses role-based access control to ensure data security. 
+                Each module has specific access requirements and safety measures in place.
+            </p>
+            
+            <div class="contact-info">
+                <p><strong>🔧 Technical Support:</strong> For system issues or feature requests</p>
+                <p><strong>📞 Admin Support:</strong> For access permissions and user management</p>
+                <p><strong>💾 Data Backup:</strong> Regular exports recommended for data safety</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">🔐 Admin Authentication</h3>
+                <span class="close" onclick="closePasswordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="modalDescription">Enter the admin password to access this module:</p>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                    </div>
+                    <button type="submit" class="auth-btn" id="authBtn">
+                        <span class="btn-text">Authenticate</span>
+                        <span class="loading" style="display: none;"></span>
+                    </button>
+                </form>
+                <div id="authError" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Required JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="security-utils.js"></script>
+    
+    <script>
+        // Secure Configuration
+        let supabase;
+        let currentModule = null;
+        let targetUrl = null;
+        let securityUtils;
+        let loginAttemptLimiter;
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Initialize security utilities
+                securityUtils = new SecurityUtils();
+                loginAttemptLimiter = securityUtils.createRateLimiter(5, 15 * 60 * 1000); // 5 attempts per 15 minutes
+                
+                // Load secure configuration
+                const config = await window.SecureConfig.loadConfig();
+                
+                if (!window.SecureConfig.validateConfig()) {
+                    throw new Error('Invalid configuration loaded');
+                }
+                
+                if (typeof window.supabase !== 'undefined') {
+                    const supabaseConfig = window.SecureConfig.getSupabaseConfig();
+                    supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                    console.log('✅ Secure Supabase connection established');
+                    
+                    // Initialize admin passwords table if needed
+                    await initializeAdminPasswords();
+                } else {
+                    throw new Error('Supabase library not loaded');
+                }
+            } catch (error) {
+                console.error('❌ Initialization failed:', error);
+                showAlert('System initialization failed. Please refresh the page.', 'error');
+            }
+
+            // Setup password form
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', handlePasswordSubmit);
+            }
+
+            // Initialize PWA features
+            initializePWA();
+        });
+
+        // PWA Initialization
+        async function initializePWA() {
+            try {
+                // Register service worker
+                if ('serviceWorker' in navigator) {
+                    const registration = await navigator.serviceWorker.register('/sw.js', {
+                        scope: '/'
+                    });
+                    
+                    console.log('✅ Service Worker registered successfully');
+                    
+                    // Handle service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateAvailable();
+                            }
+                        });
+                    });
+                } else {
+                    console.log('⚠️ Service Worker not supported');
+                }
+
+                // Check if app is installed
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    window.deferredPrompt = e;
+                    showInstallPrompt();
+                });
+
+                // Handle app installation
+                window.addEventListener('appinstalled', () => {
+                    console.log('✅ PWA installed successfully');
+                    showAlert('App installed successfully!', 'success');
+                    hideInstallPrompt();
+                });
+
+                // Check if running as PWA
+                if (window.matchMedia('(display-mode: standalone)').matches || 
+                    window.navigator.standalone === true) {
+                    console.log('📱 Running as PWA');
+                    document.body.classList.add('pwa-mode');
+                }
+
+                // Enable background sync for offline support
+                if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                    console.log('✅ Background sync supported');
+                }
+
+                // Request notification permission
+                if ('Notification' in window) {
+                    if (Notification.permission === 'default') {
+                        // Don't request immediately, wait for user interaction
+                        console.log('📱 Notifications available but not requested yet');
+                    }
+                }
+
+            } catch (error) {
+                console.error('❌ PWA initialization failed:', error);
+            }
+        }
+
+        // Show update available notification
+        function showUpdateAvailable() {
+            const updateBanner = document.createElement('div');
+            updateBanner.className = 'update-banner';
+            updateBanner.innerHTML = `
+                <div class="update-content">
+                    <span>🆕 New version available!</span>
+                    <button onclick="updateApp()" class="update-btn">Update</button>
+                    <button onclick="dismissUpdate()" class="dismiss-btn">×</button>
+                </div>
+            `;
+            updateBanner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px;
+                z-index: 10001;
+                transform: translateY(-100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            document.body.appendChild(updateBanner);
+            setTimeout(() => updateBanner.style.transform = 'translateY(0)', 100);
+        }
+
+        // Update app function
+        function updateApp() {
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        }
+
+        // Dismiss update notification
+        function dismissUpdate() {
+            const banner = document.querySelector('.update-banner');
+            if (banner) {
+                banner.style.transform = 'translateY(-100%)';
+                setTimeout(() => banner.remove(), 300);
+            }
+        }
+
+        // Show install prompt
+        function showInstallPrompt() {
+            const installBanner = document.createElement('div');
+            installBanner.className = 'install-banner';
+            installBanner.innerHTML = `
+                <div class="install-content">
+                    <span>📱 Install Society Management App for better experience!</span>
+                    <button onclick="installPWA()" class="install-btn">Install</button>
+                    <button onclick="dismissInstall()" class="dismiss-btn">×</button>
+                </div>
+            `;
+            installBanner.style.cssText = `
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0,0,0,0.9);
+                color: white;
+                padding: 15px;
+                z-index: 10001;
+                transform: translateY(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            document.body.appendChild(installBanner);
+            setTimeout(() => installBanner.style.transform = 'translateY(0)', 100);
+        }
+
+        // Install PWA
+        async function installPWA() {
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                const { outcome } = await window.deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ User accepted PWA installation');
+                } else {
+                    console.log('❌ User dismissed PWA installation');
+                }
+                
+                window.deferredPrompt = null;
+                hideInstallPrompt();
+            }
+        }
+
+        // Hide install prompt
+        function hideInstallPrompt() {
+            const banner = document.querySelector('.install-banner');
+            if (banner) {
+                banner.style.transform = 'translateY(100%)';
+                setTimeout(() => banner.remove(), 300);
+            }
+        }
+
+        // Dismiss install prompt
+        function dismissInstall() {
+            hideInstallPrompt();
+            localStorage.setItem('installPromptDismissed', Date.now());
+        }
+
+        // Initialize admin passwords in database
+        async function initializeAdminPasswords() {
+            try {
+                // Check if admin_passwords table exists and has default passwords
+                const { data: existingPasswords, error: checkError } = await supabase
+                    .from('admin_passwords')
+                    .select('module_name')
+                    .limit(1);
+
+                if (checkError && checkError.code === 'PGRST116') {
+                    // Table exists but is empty, insert default passwords
+                    await insertDefaultPasswords();
+                } else if (checkError && checkError.code === '42P01') {
+                    console.log('Admin passwords table needs to be created in database');
+                    showAlert('Admin table not found. Please create the admin_passwords table in your database.', 'error');
+                }
+            } catch (error) {
+                console.error('Error checking admin passwords:', error);
+            }
+        }
+
+        // Insert default admin passwords with secure hashing
+        async function insertDefaultPasswords() {
+            try {
+                // Generate strong default passwords
+                const strongPasswords = {
+                    'main-operations': 'SocMgmt2024@Main!',
+                    'pin-management': 'PinAdmin2024@Secure!',
+                    'data-admin': 'SuperAdmin2024@Ultra!',
+                    'member-management': 'MemberMgmt2024@Safe!'
+                };
+
+                const defaultPasswords = [];
+                
+                // Hash all passwords before storing
+                for (const [module, plainPassword] of Object.entries(strongPasswords)) {
+                    const hashedPassword = await securityUtils.hashPassword(plainPassword);
+                    
+                    let description, access_level;
+                    switch (module) {
+                        case 'main-operations':
+                            description = 'Main Operations Dashboard Access';
+                            access_level = 'admin';
+                            break;
+                        case 'pin-management':
+                            description = 'PIN Management System Access';
+                            access_level = 'admin';
+                            break;
+                        case 'data-admin':
+                            description = 'Data Administration Tools Access';
+                            access_level = 'super_admin';
+                            break;
+                        case 'member-management':
+                            description = 'Member and Subscription Management';
+                            access_level = 'admin';
+                            break;
+                    }
+                    
+                    defaultPasswords.push({
+                        module_name: module,
+                        password_hash: hashedPassword,
+                        description,
+                        access_level
+                    });
+                }
+
+                const { error } = await supabase
+                    .from('admin_passwords')
+                    .insert(defaultPasswords);
+
+                if (error) {
+                    console.error('Error inserting default passwords:', error);
+                } else {
+                    console.log('✅ Secure admin passwords initialized');
+                    console.log('🔑 Default passwords set:');
+                    Object.entries(strongPasswords).forEach(([module, password]) => {
+                        console.log(`   ${module}: ${password}`);
+                    });
+                    console.log('⚠️  Please change these passwords immediately after first login!');
+                }
+            } catch (error) {
+                console.error('Error setting up default passwords:', error);
+            }
+        }
+
+        // Access admin panel with password check
+        function accessAdminPanel(moduleName, url) {
+            currentModule = moduleName;
+            targetUrl = url;
+            
+            // Set modal content based on module
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            
+            const moduleInfo = {
+                'main-operations': {
+                    title: '📊 Main Operations Access',
+                    description: 'Enter admin password to access the main operations dashboard:'
+                },
+                'pin-management': {
+                    title: '🔐 PIN Management Access',
+                    description: 'Enter admin password to access PIN management tools:'
+                },
+                'member-management': {
+                    title: '👥 Member Management Access',
+                    description: 'Enter admin password to access member and subscription management:'
+                },
+                'data-admin': {
+                    title: '🗑️ Data Administration Access',
+                    description: 'Enter super admin password to access data administration tools:'
+                }
+            };
+            
+            const info = moduleInfo[moduleName] || {
+                title: '🔐 Admin Authentication',
+                description: 'Enter the admin password to access this module:'
+            };
+            
+            modalTitle.textContent = info.title;
+            modalDescription.textContent = info.description;
+            
+            // Clear previous input and errors
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('authError').style.display = 'none';
+            
+            // Show modal
+            document.getElementById('passwordModal').style.display = 'block';
+            
+            // Focus on password input
+            setTimeout(() => {
+                document.getElementById('adminPassword').focus();
+            }, 100);
+        }
+
+        // Handle password form submission with security
+        async function handlePasswordSubmit(event) {
+            event.preventDefault();
+            
+            const rawPassword = document.getElementById('adminPassword').value;
+            const authBtn = document.getElementById('authBtn');
+            const btnText = authBtn.querySelector('.btn-text');
+            const loading = authBtn.querySelector('.loading');
+            const errorDiv = document.getElementById('authError');
+
+            // Input validation and sanitization
+            const password = securityUtils.sanitizeInput(rawPassword, 'text');
+            if (!password || password.length < 3) {
+                showAuthError('Please enter a valid password');
+                return;
+            }
+
+            // Rate limiting check
+            const clientId = `${currentModule}_${navigator.userAgent.substring(0, 50)}`;
+            const rateLimitResult = loginAttemptLimiter(clientId);
+            
+            if (!rateLimitResult.allowed) {
+                const resetTime = new Date(rateLimitResult.resetTime);
+                showAuthError(`Too many failed attempts. Try again after ${resetTime.toLocaleTimeString()}`);
+                return;
+            }
+
+            // Show loading state
+            authBtn.disabled = true;
+            btnText.style.display = 'none';
+            loading.style.display = 'inline-block';
+            errorDiv.style.display = 'none';
+
+            try {
+                // Check password in database
+                const { data: adminPassword, error } = await supabase
+                    .from('admin_passwords')
+                    .select('password_hash, access_level, description')
+                    .eq('module_name', currentModule)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        throw new Error('Module not found in admin system');
+                    }
+                    throw error;
+                }
+
+                // Secure password verification
+                const isValidPassword = await securityUtils.verifyPassword(password, adminPassword.password_hash);
+                
+                if (isValidPassword) {
+                    // Success - create secure session
+                    const sessionKey = `admin_session_${currentModule}`;
+                    const csrfToken = securityUtils.generateCSRFToken();
+                    
+                    const sessionData = {
+                        module: currentModule,
+                        accessLevel: adminPassword.access_level,
+                        timestamp: Date.now(),
+                        expires: Date.now() + (2 * 60 * 60 * 1000), // 2 hours
+                        csrfToken: csrfToken,
+                        userAgent: navigator.userAgent.substring(0, 100)
+                    };
+                    
+                    // Encrypt session data
+                    const encryptedSession = securityUtils.encryptSessionData(sessionData, 'session-key');
+                    localStorage.setItem(sessionKey, encryptedSession);
+                    
+                    // Log successful authentication
+                    console.log(`✅ Successful authentication for ${currentModule} module`);
+                    
+                    showAlert('🔐 Authentication successful! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 1000);
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+
+            } catch (error) {
+                console.error('❌ Authentication error:', error);
+                showAuthError(error.message || 'Authentication failed');
+                
+                // Clear password field on failed attempt
+                document.getElementById('adminPassword').value = '';
+                
+            } finally {
+                // Restore button state
+                authBtn.disabled = false;
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        }
+
+        // Close password modal
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('authError').style.display = 'none';
+        }
+
+        // Show authentication error
+        function showAuthError(message) {
+            const errorDiv = document.getElementById('authError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Utility function to show alerts
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                max-width: 500px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-weight: 500;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // Style based on type
+            if (type === 'success') {
+                alertDiv.style.background = '#d4edda';
+                alertDiv.style.color = '#155724';
+                alertDiv.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                alertDiv.style.background = '#f8d7da';
+                alertDiv.style.color = '#721c24';
+                alertDiv.style.border = '1px solid #f5c6cb';
+            }
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            alertDiv.innerHTML = `${icons[type] || '💡'} ${message}`;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto dismiss
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, type === 'error' ? 5000 : 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (event.target === modal) {
+                closePasswordModal();
+            }
+        }
+
+        // Handle Enter key in modal
+        document.addEventListener('keydown', function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (modal.style.display === 'block') {
+                if (event.key === 'Escape') {
+                    closePasswordModal();
+                } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    document.getElementById('passwordForm').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
+        console.log('Society Management System - Home page loaded successfully!');
+    </script>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-body p {
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 50px;
+        }
+
+        .auth-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .auth-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* Mobile responsiveness for modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</body>
+</html>
