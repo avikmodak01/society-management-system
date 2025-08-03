@@ -96,7 +96,28 @@
                 return false;
             }
             
-            const session = JSON.parse(sessionData);
+            // Try to decrypt session data first, fallback to plain JSON
+            let session;
+            try {
+                // Try decrypting (for new encrypted sessions)
+                if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                    session = securityUtils.decryptSessionData(sessionData, 'session-key');
+                } else {
+                    // Fallback to plain JSON (for legacy sessions)
+                    session = JSON.parse(sessionData);
+                }
+            } catch (decryptError) {
+                // If decryption fails, try plain JSON parse
+                try {
+                    session = JSON.parse(sessionData);
+                } catch (parseError) {
+                    console.error('Failed to parse session data:', parseError);
+                    localStorage.removeItem(sessionKey);
+                    redirectToHome('Invalid session format');
+                    return false;
+                }
+            }
+            
             const now = Date.now();
             
             // Check if session is expired
@@ -217,7 +238,18 @@
             }
             
             try {
-                const session = JSON.parse(sessionData);
+                // Decrypt session data
+                let session;
+                try {
+                    if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                        session = securityUtils.decryptSessionData(sessionData, 'session-key');
+                    } else {
+                        session = JSON.parse(sessionData);
+                    }
+                } catch (decryptError) {
+                    session = JSON.parse(sessionData);
+                }
+                
                 const now = Date.now();
                 
                 if (now > session.expires) {
@@ -279,7 +311,18 @@
         
         if (sessionData) {
             try {
-                const session = JSON.parse(sessionData);
+                // Decrypt session data
+                let session;
+                try {
+                    if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                        session = securityUtils.decryptSessionData(sessionData, 'session-key');
+                    } else {
+                        session = JSON.parse(sessionData);
+                    }
+                } catch (decryptError) {
+                    session = JSON.parse(sessionData);
+                }
+                
                 const indicator = document.createElement('div');
                 indicator.id = 'adminSessionIndicator';
                 indicator.style.cssText = `
@@ -432,7 +475,17 @@ function checkAdminPermission(requiredLevel) {
         const sessionData = localStorage.getItem(sessionKey);
         if (!sessionData) return false;
         
-        const session = JSON.parse(sessionData);
+        // Decrypt session data
+        let session;
+        try {
+            if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                session = securityUtils.decryptSessionData(sessionData, 'session-key');
+            } else {
+                session = JSON.parse(sessionData);
+            }
+        } catch (decryptError) {
+            session = JSON.parse(sessionData);
+        }
         
         // Check access level hierarchy
         const accessLevels = {
