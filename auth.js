@@ -88,15 +88,8 @@
         const currentModule = getCurrentModule();
         const sessionKey = `admin_session_${currentModule}`;
         
-        console.log('🔍 Auth Debug - Current Module:', currentModule);
-        console.log('🔍 Auth Debug - Session Key:', sessionKey);
-        
         try {
             const sessionData = localStorage.getItem(sessionKey);
-            console.log('🔍 Auth Debug - Session Data exists:', !!sessionData);
-            if (sessionData) {
-                console.log('🔍 Auth Debug - Session Data length:', sessionData.length);
-            }
             
             if (!sessionData) {
                 redirectToHome('No authentication session found');
@@ -105,70 +98,49 @@
             
             // Try to decrypt session data first, fallback to plain JSON
             let session;
-            console.log('🔍 Auth Debug - securityUtils available:', typeof securityUtils !== 'undefined');
-            console.log('🔍 Auth Debug - Session data starts with:', sessionData.substring(0, 20));
             
             // Check if data looks like base64 (encrypted)
             const isBase64 = /^[A-Za-z0-9+/]+=*$/.test(sessionData) && sessionData.length > 20;
-            console.log('🔍 Auth Debug - Looks like base64:', isBase64);
             
             try {
                 // Try decrypting first if it looks encrypted or securityUtils is available
                 if (isBase64 && typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
-                    console.log('🔍 Auth Debug - Attempting to decrypt session');
                     session = securityUtils.decryptSessionData(sessionData, 'session-key');
-                    console.log('🔍 Auth Debug - Decryption successful');
                 } else if (!isBase64) {
                     // If it doesn't look encrypted, try JSON parse directly
-                    console.log('🔍 Auth Debug - Using plain JSON parse (not encrypted)');
                     session = JSON.parse(sessionData);
-                    console.log('🔍 Auth Debug - Plain JSON parse successful');
                 } else {
                     // Encrypted but no decryption available - try manual base64 decode
-                    console.log('🔍 Auth Debug - Encrypted session but no decryption available, trying manual decode');
                     try {
                         // Try simple base64 decode (for basic encryption)
                         const decoded = atob(sessionData);
                         session = JSON.parse(decoded);
-                        console.log('🔍 Auth Debug - Manual base64 decode successful');
                     } catch (manualError) {
-                        console.log('🔍 Auth Debug - Manual decode failed:', manualError.message);
                         localStorage.removeItem(sessionKey);
                         redirectToHome('Session encrypted but decryption not available. Please login again.');
                         return false;
                     }
                 }
             } catch (error) {
-                console.log('🔍 Auth Debug - Primary parsing failed:', error.message);
                 // Last resort - try the opposite approach
                 try {
                     if (isBase64) {
-                        console.log('🔍 Auth Debug - Encrypted data fallback - clearing session');
                         localStorage.removeItem(sessionKey);
                         redirectToHome('Unable to decrypt session. Please login again.');
                         return false;
                     } else {
-                        console.log('🔍 Auth Debug - Trying JSON parse as fallback');
                         session = JSON.parse(sessionData);
-                        console.log('🔍 Auth Debug - Fallback JSON parse successful');
                     }
                 } catch (parseError) {
-                    console.error('🔍 Auth Debug - All parsing attempts failed:', parseError);
                     localStorage.removeItem(sessionKey);
                     redirectToHome('Invalid session format. Please login again.');
                     return false;
                 }
             }
             
-            console.log('🔍 Auth Debug - Session parsed:', session);
-            
             const now = Date.now();
             
             // Check if session is expired
-            console.log('🔍 Auth Debug - Session expires:', new Date(session.expires));
-            console.log('🔍 Auth Debug - Current time:', new Date(now));
-            console.log('🔍 Auth Debug - Session expired?', now > session.expires);
-            
             if (now > session.expires) {
                 localStorage.removeItem(sessionKey);
                 redirectToHome('Session expired. Please authenticate again');
@@ -176,10 +148,6 @@
             }
             
             // Check if module matches
-            console.log('🔍 Auth Debug - Session module:', session.module);
-            console.log('🔍 Auth Debug - Current module:', currentModule);
-            console.log('🔍 Auth Debug - Module match?', session.module === currentModule);
-            
             if (session.module !== currentModule) {
                 redirectToHome('Invalid session for this module');
                 return false;
@@ -363,16 +331,23 @@
         
         if (sessionData) {
             try {
-                // Decrypt session data
+                // Decrypt session data using same logic as checkAuthentication
                 let session;
+                const isBase64 = /^[A-Za-z0-9+/]+=*$/.test(sessionData) && sessionData.length > 20;
+                
                 try {
-                    if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                    if (isBase64 && typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
                         session = securityUtils.decryptSessionData(sessionData, 'session-key');
-                    } else {
+                    } else if (!isBase64) {
                         session = JSON.parse(sessionData);
+                    } else {
+                        // Manual base64 decode
+                        const decoded = atob(sessionData);
+                        session = JSON.parse(decoded);
                     }
-                } catch (decryptError) {
-                    session = JSON.parse(sessionData);
+                } catch (error) {
+                    console.error('Failed to parse session for indicator:', error);
+                    return; // Skip indicator if session can't be parsed
                 }
                 
                 const indicator = document.createElement('div');
@@ -514,7 +489,6 @@
     window.adminLogout = adminLogout;
     
     // Initialize - securityUtils is optional now
-    console.log('🔍 Auth Debug - securityUtils available at init:', typeof securityUtils !== 'undefined');
     init();
     
 })();
@@ -528,16 +502,22 @@ function checkAdminPermission(requiredLevel) {
         const sessionData = localStorage.getItem(sessionKey);
         if (!sessionData) return false;
         
-        // Decrypt session data
+        // Decrypt session data using same logic as checkAuthentication
         let session;
+        const isBase64 = /^[A-Za-z0-9+/]+=*$/.test(sessionData) && sessionData.length > 20;
+        
         try {
-            if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+            if (isBase64 && typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
                 session = securityUtils.decryptSessionData(sessionData, 'session-key');
-            } else {
+            } else if (!isBase64) {
                 session = JSON.parse(sessionData);
+            } else {
+                // Manual base64 decode
+                const decoded = atob(sessionData);
+                session = JSON.parse(decoded);
             }
-        } catch (decryptError) {
-            session = JSON.parse(sessionData);
+        } catch (error) {
+            return false; // Permission denied if session can't be parsed
         }
         
         // Check access level hierarchy
