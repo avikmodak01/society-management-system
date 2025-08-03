@@ -148,9 +148,6 @@ class SecureConfig {
     }
 
     getEnvVar(name, defaultValue = null) {
-        // For Netlify build process, environment variables are injected at build time
-        // They become available in different ways depending on the build process
-        
         // Try window.__ENV (runtime injection from Netlify)
         if (typeof window !== 'undefined' && window.__ENV) {
             const value = window.__ENV[name];
