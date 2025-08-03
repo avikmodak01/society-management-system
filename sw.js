@@ -1,11 +1,11 @@
 // Service Worker for Society Management System PWA
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'society-app-v1.2.0';
-const STATIC_CACHE = 'society-static-v1.2.0';
-const DYNAMIC_CACHE = 'society-dynamic-v1.2.0';
+const CACHE_NAME = 'society-app-v1.2.1';
+const STATIC_CACHE = 'society-static-v1.2.1';
+const DYNAMIC_CACHE = 'society-dynamic-v1.2.1';
 
-// Files to cache immediately
+// Files to cache immediately (only local files to avoid CSP violations)
 const STATIC_FILES = [
   '/',
   '/index.html',
@@ -15,14 +15,14 @@ const STATIC_FILES = [
   '/member-management.html',
   '/data-admin.html',
   '/home-dashboard.css',
+  '/modern-styles.css',
   '/config.js',
   '/security-utils.js',
   '/auth.js',
   '/script.js',
-  '/manifest.json',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+  '/inject-env.js',
+  '/icons/icon.svg',
+  '/manifest.json'
 ];
 
 // URLs that should always be fetched from network
