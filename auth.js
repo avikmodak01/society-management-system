@@ -124,11 +124,19 @@
                     session = JSON.parse(sessionData);
                     console.log('🔍 Auth Debug - Plain JSON parse successful');
                 } else {
-                    // Encrypted but no decryption available - clear invalid session
-                    console.log('🔍 Auth Debug - Encrypted session but no decryption available');
-                    localStorage.removeItem(sessionKey);
-                    redirectToHome('Session encrypted but decryption not available. Please login again.');
-                    return false;
+                    // Encrypted but no decryption available - try manual base64 decode
+                    console.log('🔍 Auth Debug - Encrypted session but no decryption available, trying manual decode');
+                    try {
+                        // Try simple base64 decode (for basic encryption)
+                        const decoded = atob(sessionData);
+                        session = JSON.parse(decoded);
+                        console.log('🔍 Auth Debug - Manual base64 decode successful');
+                    } catch (manualError) {
+                        console.log('🔍 Auth Debug - Manual decode failed:', manualError.message);
+                        localStorage.removeItem(sessionKey);
+                        redirectToHome('Session encrypted but decryption not available. Please login again.');
+                        return false;
+                    }
                 }
             } catch (error) {
                 console.log('🔍 Auth Debug - Primary parsing failed:', error.message);
@@ -505,7 +513,8 @@
     // Expose logout function globally
     window.adminLogout = adminLogout;
     
-    // Initialize
+    // Initialize - securityUtils is optional now
+    console.log('🔍 Auth Debug - securityUtils available at init:', typeof securityUtils !== 'undefined');
     init();
     
 })();
