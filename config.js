@@ -149,27 +149,21 @@ class SecureConfig {
 
     getEnvVar(name, defaultValue = null) {
         // For Netlify build process, environment variables are injected at build time
-        // They become available as import.meta.env in Vite builds
+        // They become available in different ways depending on the build process
         
-        // Try Vite environment variables (build-time injection)
-        if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-            const value = import.meta.env[name];
-            if (value !== undefined) return value;
-        }
-        
-        // Try window.__ENV (runtime injection)
+        // Try window.__ENV (runtime injection from Netlify)
         if (typeof window !== 'undefined' && window.__ENV) {
             const value = window.__ENV[name];
             if (value !== undefined) return value;
         }
         
-        // Try process.env (Node.js environment)
+        // Try process.env (Node.js environment - for build time)
         if (typeof process !== 'undefined' && process.env) {
             const value = process.env[name];
             if (value !== undefined) return value;
         }
         
-        // Try different naming conventions
+        // Try different naming conventions for Netlify environment variables
         const variations = [
             name,
             `VITE_${name}`,
@@ -179,19 +173,19 @@ class SecureConfig {
         ];
         
         for (const variation of variations) {
-            if (typeof import !== 'undefined' && import.meta && import.meta.env) {
-                const value = import.meta.env[variation];
-                if (value !== undefined) return value;
+            // Check window.__ENV for each variation
+            if (typeof window !== 'undefined' && window.__ENV && window.__ENV[variation] !== undefined) {
+                return window.__ENV[variation];
             }
             
-            if (typeof window !== 'undefined' && window.__ENV) {
-                const value = window.__ENV[variation];
-                if (value !== undefined) return value;
+            // Check process.env for each variation
+            if (typeof process !== 'undefined' && process.env && process.env[variation] !== undefined) {
+                return process.env[variation];
             }
             
-            if (typeof process !== 'undefined' && process.env) {
-                const value = process.env[variation];
-                if (value !== undefined) return value;
+            // For Netlify builds, environment variables might be directly available on window
+            if (typeof window !== 'undefined' && window[variation] !== undefined) {
+                return window[variation];
             }
         }
 
