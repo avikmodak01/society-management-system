@@ -88,8 +88,15 @@
         const currentModule = getCurrentModule();
         const sessionKey = `admin_session_${currentModule}`;
         
+        console.log('🔍 Auth Debug - Current Module:', currentModule);
+        console.log('🔍 Auth Debug - Session Key:', sessionKey);
+        
         try {
             const sessionData = localStorage.getItem(sessionKey);
+            console.log('🔍 Auth Debug - Session Data exists:', !!sessionData);
+            if (sessionData) {
+                console.log('🔍 Auth Debug - Session Data length:', sessionData.length);
+            }
             
             if (!sessionData) {
                 redirectToHome('No authentication session found');
@@ -98,18 +105,24 @@
             
             // Try to decrypt session data first, fallback to plain JSON
             let session;
+            console.log('🔍 Auth Debug - securityUtils available:', typeof securityUtils !== 'undefined');
             try {
                 // Try decrypting (for new encrypted sessions)
                 if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                    console.log('🔍 Auth Debug - Attempting to decrypt session');
                     session = securityUtils.decryptSessionData(sessionData, 'session-key');
+                    console.log('🔍 Auth Debug - Decryption successful');
                 } else {
                     // Fallback to plain JSON (for legacy sessions)
+                    console.log('🔍 Auth Debug - Using plain JSON parse');
                     session = JSON.parse(sessionData);
                 }
             } catch (decryptError) {
+                console.log('🔍 Auth Debug - Decryption failed, trying plain JSON:', decryptError.message);
                 // If decryption fails, try plain JSON parse
                 try {
                     session = JSON.parse(sessionData);
+                    console.log('🔍 Auth Debug - Plain JSON parse successful');
                 } catch (parseError) {
                     console.error('Failed to parse session data:', parseError);
                     localStorage.removeItem(sessionKey);
@@ -118,9 +131,15 @@
                 }
             }
             
+            console.log('🔍 Auth Debug - Session parsed:', session);
+            
             const now = Date.now();
             
             // Check if session is expired
+            console.log('🔍 Auth Debug - Session expires:', new Date(session.expires));
+            console.log('🔍 Auth Debug - Current time:', new Date(now));
+            console.log('🔍 Auth Debug - Session expired?', now > session.expires);
+            
             if (now > session.expires) {
                 localStorage.removeItem(sessionKey);
                 redirectToHome('Session expired. Please authenticate again');
@@ -128,6 +147,10 @@
             }
             
             // Check if module matches
+            console.log('🔍 Auth Debug - Session module:', session.module);
+            console.log('🔍 Auth Debug - Current module:', currentModule);
+            console.log('🔍 Auth Debug - Module match?', session.module === currentModule);
+            
             if (session.module !== currentModule) {
                 redirectToHome('Invalid session for this module');
                 return false;
