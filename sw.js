@@ -1,9 +1,9 @@
 // Service Worker for Society Management System PWA
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'society-app-v1.2.1';
-const STATIC_CACHE = 'society-static-v1.2.1';
-const DYNAMIC_CACHE = 'society-dynamic-v1.2.1';
+const CACHE_NAME = 'society-app-v1.2.2';
+const STATIC_CACHE = 'society-static-v1.2.2';
+const DYNAMIC_CACHE = 'society-dynamic-v1.2.2';
 
 // Files to cache immediately (only local files to avoid CSP violations)
 const STATIC_FILES = [
@@ -104,6 +104,15 @@ self.addEventListener('fetch', (event) => {
   
   // Skip chrome-extension requests
   if (url.protocol === 'chrome-extension:') {
+    return;
+  }
+  
+  // Skip external CDN requests to avoid CSP violations
+  if (url.hostname.includes('cdn.jsdelivr.net') || 
+      url.hostname.includes('cdnjs.cloudflare.com') ||
+      url.hostname.includes('unpkg.com') ||
+      url.hostname.includes('googleapis.com') ||
+      (url.hostname !== self.location.hostname && !url.hostname.includes('supabase.co'))) {
     return;
   }
   
