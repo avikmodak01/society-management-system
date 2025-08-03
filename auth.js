@@ -106,27 +106,48 @@
             // Try to decrypt session data first, fallback to plain JSON
             let session;
             console.log('🔍 Auth Debug - securityUtils available:', typeof securityUtils !== 'undefined');
+            console.log('🔍 Auth Debug - Session data starts with:', sessionData.substring(0, 20));
+            
+            // Check if data looks like base64 (encrypted)
+            const isBase64 = /^[A-Za-z0-9+/]+=*$/.test(sessionData) && sessionData.length > 20;
+            console.log('🔍 Auth Debug - Looks like base64:', isBase64);
+            
             try {
-                // Try decrypting (for new encrypted sessions)
-                if (typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
+                // Try decrypting first if it looks encrypted or securityUtils is available
+                if (isBase64 && typeof securityUtils !== 'undefined' && securityUtils.decryptSessionData) {
                     console.log('🔍 Auth Debug - Attempting to decrypt session');
                     session = securityUtils.decryptSessionData(sessionData, 'session-key');
                     console.log('🔍 Auth Debug - Decryption successful');
-                } else {
-                    // Fallback to plain JSON (for legacy sessions)
-                    console.log('🔍 Auth Debug - Using plain JSON parse');
-                    session = JSON.parse(sessionData);
-                }
-            } catch (decryptError) {
-                console.log('🔍 Auth Debug - Decryption failed, trying plain JSON:', decryptError.message);
-                // If decryption fails, try plain JSON parse
-                try {
+                } else if (!isBase64) {
+                    // If it doesn't look encrypted, try JSON parse directly
+                    console.log('🔍 Auth Debug - Using plain JSON parse (not encrypted)');
                     session = JSON.parse(sessionData);
                     console.log('🔍 Auth Debug - Plain JSON parse successful');
-                } catch (parseError) {
-                    console.error('Failed to parse session data:', parseError);
+                } else {
+                    // Encrypted but no decryption available - clear invalid session
+                    console.log('🔍 Auth Debug - Encrypted session but no decryption available');
                     localStorage.removeItem(sessionKey);
-                    redirectToHome('Invalid session format');
+                    redirectToHome('Session encrypted but decryption not available. Please login again.');
+                    return false;
+                }
+            } catch (error) {
+                console.log('🔍 Auth Debug - Primary parsing failed:', error.message);
+                // Last resort - try the opposite approach
+                try {
+                    if (isBase64) {
+                        console.log('🔍 Auth Debug - Encrypted data fallback - clearing session');
+                        localStorage.removeItem(sessionKey);
+                        redirectToHome('Unable to decrypt session. Please login again.');
+                        return false;
+                    } else {
+                        console.log('🔍 Auth Debug - Trying JSON parse as fallback');
+                        session = JSON.parse(sessionData);
+                        console.log('🔍 Auth Debug - Fallback JSON parse successful');
+                    }
+                } catch (parseError) {
+                    console.error('🔍 Auth Debug - All parsing attempts failed:', parseError);
+                    localStorage.removeItem(sessionKey);
+                    redirectToHome('Invalid session format. Please login again.');
                     return false;
                 }
             }

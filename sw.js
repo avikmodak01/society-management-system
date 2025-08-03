@@ -1,9 +1,9 @@
 // Service Worker for Society Management System PWA
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'society-app-v1.2.2';
-const STATIC_CACHE = 'society-static-v1.2.2';
-const DYNAMIC_CACHE = 'society-dynamic-v1.2.2';
+const CACHE_NAME = 'society-app-v1.2.3';
+const STATIC_CACHE = 'society-static-v1.2.3';
+const DYNAMIC_CACHE = 'society-dynamic-v1.2.3';
 
 // Files to cache immediately (only local files to avoid CSP violations)
 const STATIC_FILES = [
